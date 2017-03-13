@@ -1,68 +1,52 @@
-var mongo = require('mongodb');
-// get mongo client
-var mongoClient = mongo.MongoClient;
-var mongoDb;
-mongoClient.connect("MONGOLAB_URI", function(err, db) {
-  if(!err) {
-    console.log("We are connected");
-    mongoDb = db;
-  }
-  else
-  {
-    console.log("Unable to connect to the db");
-  }
-});
+'use strict';
 
- var pubnub = require("../../config/pubnub.js")
+var _ = require('lodash');
+var Contact = require('./contact.model');
 
 // Get list of contacts
 exports.index = function(req, res) {
-	      // Connect to the db
-    if (mongoDb){
-      var collection = mongoDb.collection('contacts');
-      collection.find().toArray(function(err, items) {
-        res.send(items);
-      });
-    }
-    else
-    {
-        console.log('No database object!');
-    }
+          // Connect to the db
+   Contact.find(function (err, contacts) {
+    if(err) { return handleError(res, err); }
+    return res.json(200, contacts);
+  });
 
 } ;
 
 // Creates a new contact in datastore.
 exports.create = function(req, res) {
- var contact = req.body;
-    console.log('Adding contact: ' + JSON.stringify(contact));
-    if (mongoDb){
-      var collection = mongoDb.collection('contacts');
-      collection.insert(contact, {w:1}, function(err, result) {
-            if (err) {
-                res.send({'error':'An error has occurred'});
-            } else {
-                pubnub.publish({
-                        channel: 'create_contact_event',        
-                        message: JSON.stringify(contact),
-                        callback : function(m){console.log('New_Contact_Event:' + m)}
-                });
-                console.log('Success: ' + JSON.stringify(contact));
-                res.send(result[0]);
-            }
-        });
-    }
-  else
-  {
-    console.log('No database object!');
-  }
+  Contact.create(req.body, function(err, contact) {
+    if(err) { return handleError(res, err); }
+    return res.json(201, contact);
+  });
 };
 
-// Update an existing contact in datastore.
+// Updates an existing contact in the DB.
 exports.update = function(req, res) {
-//TODO
+  if(req.body._id) { delete req.body._id; }
+  Contact.findById(req.params.id, function (err, contact) {
+    if (err) { return handleError(res, err); }
+    if(!contact) { return res.send(404); }
+    var updated = _.merge(contact, req.body);
+    updated.save(function (err) {
+      if (err) { return handleError(res, err); }
+      return res.json(200, contact);
+    });
+  });
 };
 
 // delete an existing contact in datastore.
 exports.delete = function(req, res) {
-//TODO
+    Contact.findById(req.params.id, function (err, contact) {
+    if(err) { return handleError(res, err); }
+    if(!contact) { return res.send(404); }
+    contact.remove(function(err) {
+      if(err) { return handleError(res, err); }
+      return res.send(204);
+    });
+  });
+};
+
+function handleError(res, err) {
+  return res.send(500, err);
 };
