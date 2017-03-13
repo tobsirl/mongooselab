@@ -1,5 +1,5 @@
 {
-  "name": "lab7",
+  "name": "mongooselab",
   "version": "1.0.0",
   "description": "web service lab",
   "main": "index.js",
@@ -15,5 +15,14 @@
     "mailgun-js": "^0.7.7",
     "mongoose": "^4.4.5",
     "pubnub": "^3.10.3"
-  }
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tobsirl/mongooselab.git"
+  },
+  "bugs": {
+    "url": "https://github.com/tobsirl/mongooselab/issues"
+  },
+  "homepage": "https://github.com/tobsirl/mongooselab#readme"
 }
