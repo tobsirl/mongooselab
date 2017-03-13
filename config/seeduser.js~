@@ -1,0 +1,49 @@
+/**
+ * Populate DB with sample data on server start
+ * to disable, edit config/environment/index.js, and set `seedDB: false`
+ */
+
+'use strict';
+
+var Thing = require('../api/thing/thing.model');
+var User = require('../api/user/user.model');
+var Progress = require('../api/progress/progress.model');
+
+
+User.find({}).remove(function() {
+  User.create({
+    provider: 'local',
+    name: 'Test User',
+    email: 'fxwalsh@wit,ie',
+    password: 'chester'
+  }, {
+    provider: 'local',
+    role: 'admin',
+    name: 'Admin',
+    email: 'admin@admin.com',
+    password: 'chester'
+  }, function() {
+      console.log('finished populating users');
+    }
+  );
+});
+
+Progress.find({}).remove(function() {
+  Progress.create({
+    name : 'fxwalsh',
+    completed : ["GET GIT","REPOSITORY","COMMIT TO IT","GITHUBBIN","REMOTE CONTROL"],
+    current : 'REMOTE CONTROL'
+  }, {
+    name : 'jshalpin',
+    completed : ["GET GIT","REPOSITORY","COMMIT TO IT"],
+    current : 'REMOTE CONTROL'
+  },{
+    name : 'ipglare',
+    completed : ["GET GIT","REPOSITORY","COMMIT TO IT","GITHUBBIN","REMOTE CONTROL"],
+    current : 'REMOTE CONTROL'
+  },{
+    name : 'mkdon',
+    completed : ["GET GIT","REPOSITORY","COMMIT TO IT","GITHUBBIN","REMOTE CONTROL"],
+    current : 'REMOTE CONTROL'
+  });
+});
